@@ -76,6 +76,19 @@ class DriftResponse(BaseModel):
     alert: Optional[DriftAlert]
 
 
+class DriftAlertRecord(BaseModel):
+    """Persisted drift alert — survives restarts, acknowledgeable by an operator."""
+    alert_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    intent: str
+    old_dominant_skill: str
+    new_dominant_skill: str
+    window_size: int
+    detected_at: str = Field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
+    acknowledged: bool = False
+
+
 class SkillSuggestion(BaseModel):
     """Routing suggestion: an alternative skill that scored better for an intent."""
     suggestion_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
