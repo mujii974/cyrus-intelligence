@@ -141,13 +141,21 @@ Environment variables (see `.env.example`):
 
 ```bash
 make install   # pip install -e .
-make test      # pytest --tb=short -q  (62 tests)
+make test      # pytest --tb=short -q  (68 tests)
 make test-v    # verbose test run
 make run       # uvicorn with --reload on port 8002
 make lint      # ruff if installed
 ```
 
 Tests live in `tests/` — unit coverage for the store and both engines plus API-level tests for every endpoint via httpx `ASGITransport`.
+
+### Integration tests
+
+```bash
+pytest tests/test_integration.py -v
+```
+
+Integration tests run against the ASGI app in-process — no running server required. They cover the full Orchestrator round-trip: snapshot batch submission, retrieval by skill, counterfactual evaluation, drift detection, health counts, empty batches, and concurrent submissions.
 
 ## Platform Context
 
