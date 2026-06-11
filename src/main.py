@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from src.config import Settings
+from src.config import VERSION, Settings
 from src.store.drift_alert_store import DriftAlertStore
 from src.store.snapshot_store import WeightSnapshotStore
 from src.store.suggestion_store import SuggestionStore
@@ -33,18 +33,18 @@ async def lifespan(app: FastAPI):
     )
     yield
     # Teardown
-    logger.info("cyrus-intelligence shutting down")
+    logger.info("Intelligence Engine shutting down")
     for attr_name in ("snapshot_store", "suggestion_store", "drift_alert_store"):
         store = getattr(app.state, attr_name, None)
         if store is not None and hasattr(store, "close"):
             store.close()
-    logger.info("cyrus-intelligence shutdown complete")
+    logger.info("All stores closed")
 
 
 app = FastAPI(
     title="CYRUS Intelligence Engine",
     description="Standalone skill intelligence service — counterfactual scoring and intent drift detection.",
-    version="0.1.0",
+    version=VERSION,
     lifespan=lifespan,
     docs_url=None,
     redoc_url=None,

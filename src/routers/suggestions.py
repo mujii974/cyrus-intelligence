@@ -46,7 +46,10 @@ async def trigger_generate(request: Request):
                 "SELECT payload_json FROM weight_snapshots ORDER BY recorded_at DESC LIMIT 200"
             ).fetchall()
         snapshots = [WeightSnapshot.model_validate_json(r["payload_json"]) for r in rows]
-        suggestions = generate_suggestions(snapshots)
+        suggestions = generate_suggestions(
+            snapshots,
+            delta_threshold=request.app.state.settings.suggestion_delta_threshold,
+        )
         saved = sugg_store.save_batch(suggestions)
         return {"generated": saved}
     except Exception as exc:

@@ -15,6 +15,10 @@ async def health():
 
 @router.get("/health/detailed")
 async def health_detailed(request: Request):
-    settings = request.app.state.settings
-    snapshot_store = getattr(request.app.state, "snapshot_store", None)
-    return build_detailed_health(settings=settings, snapshot_store=snapshot_store)
+    state = request.app.state
+    return await build_detailed_health(
+        settings=state.settings,
+        snapshot_store=getattr(state, "snapshot_store", None),
+        suggestion_store=getattr(state, "suggestion_store", None),
+        drift_alert_store=getattr(state, "drift_alert_store", None),
+    )
