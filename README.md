@@ -125,6 +125,21 @@ curl http://localhost:8002/health/detailed
 #  "components":{"snapshot_store":{"snapshot_count":0,"db_path":"data/snapshots.db"}}}
 ```
 
+## Skill Suggestions
+
+The Intelligence Engine generates routing suggestions when execution history shows a better skill would have been selected.
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/suggestions` | All active suggestions, newest first (`limit` query param, default 20, max 100) |
+| `GET` | `/suggestions/{intent}` | Most recent suggestion for a specific intent (404 if none) |
+| `POST` | `/suggestions/{id}/dismiss` | Dismiss a suggestion (404 if not found) |
+| `POST` | `/suggestions/generate` | Trigger suggestion generation from recent snapshots |
+
+Suggestions are generated automatically when snapshots are submitted via `POST /snapshots`. A suggestion appears when an alternative skill would have scored better by at least `SUGGESTION_DELTA_THRESHOLD` (default 0.1). Confidence is derived from sample count: low (<5), medium (5–20), high (>20).
+
+Suggestions never influence `zero_trust_cleared` — there is no code path from suggestions to trust.
+
 ## Configuration
 
 Environment variables (see `.env.example`):
