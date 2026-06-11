@@ -1,9 +1,13 @@
 """Snapshot storage endpoints."""
 from __future__ import annotations
 
+import logging
+
 from fastapi import APIRouter, Request, HTTPException
 
 from src.models.snapshot import SnapshotBatch, WeightSnapshot
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/snapshots", tags=["snapshots"])
 
@@ -13,6 +17,19 @@ async def record_snapshots(batch: SnapshotBatch, request: Request):
     """Record a batch of WeightSnapshots from an Orchestrator run."""
     store = request.app.state.snapshot_store
     count = store.save_batch(batch.snapshots)
+
+    # Fire-and-forget suggestion generation — must never fail the submission
+    try:
+        suggestion_store = getattr(request.app.state, "suggestion_store", None)
+        if suggestion_store is not None and batch.snapshots:
+            from src.store.suggestion_store import generate_suggestions
+
+            suggestions = generate_suggestions(batch.snapshots)
+            if suggestions:
+                suggestion_store.save_batch(suggestions)
+    except Exception as exc:
+        logger.warning("suggestion generation failed (non-fatal): %s", exc)
+
     return {"request_id": batch.request_id, "saved": count}
 
 

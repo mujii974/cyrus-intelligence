@@ -74,3 +74,18 @@ class DriftResponse(BaseModel):
     snapshot_count: int
     drift_detected: bool
     alert: Optional[DriftAlert]
+
+
+class SkillSuggestion(BaseModel):
+    """Routing suggestion: an alternative skill that scored better for an intent."""
+    suggestion_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    intent: str
+    current_skill_id: str
+    suggested_skill_id: str
+    delta: float                 # mean score improvement over current
+    sample_count: int            # snapshots this suggestion is based on
+    confidence: str              # "low" | "medium" | "high"
+    created_at: str = Field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
+    dismissed: bool = False
