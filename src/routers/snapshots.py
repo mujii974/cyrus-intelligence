@@ -24,7 +24,11 @@ async def record_snapshots(batch: SnapshotBatch, request: Request):
         if suggestion_store is not None and batch.snapshots:
             from src.store.suggestion_store import generate_suggestions
 
-            suggestions = generate_suggestions(batch.snapshots)
+            settings = request.app.state.settings
+            suggestions = generate_suggestions(
+                batch.snapshots,
+                delta_threshold=settings.suggestion_delta_threshold,
+            )
             if suggestions:
                 suggestion_store.save_batch(suggestions)
     except Exception as exc:
