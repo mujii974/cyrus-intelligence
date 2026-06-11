@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+# Spec named "setuptools.backends.legacy:build", which does not exist in
+# setuptools — build_meta is the supported backend.
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cyrus-intelligence"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi~=0.115",
+    "uvicorn[standard]~=0.32",
+    "pydantic~=2.9",
+    "pydantic-settings~=2.6",
+    "httpx~=0.28",
+    "pytest~=8.3",
+    "pytest-asyncio~=0.24",
+    "pytest-httpx~=0.35",
+    "rich~=13.9",
+]
+
+[project.scripts]
+cyrus-intel = "src.cli:app"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
